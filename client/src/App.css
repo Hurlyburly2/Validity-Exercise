@@ -1,22 +1,80 @@
-.App {
-  text-align: center;
+body {
+  font-family: 'Open Sans', sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
+.mainDiv {
+  margin: 25px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.recordContainer {
+  margin-top: 50px;
 }
 
-.App-link {
-  color: #09d3ac;
+.record ul {
+  margin: 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
+
+.record li {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.odd {
+  background-color: #FFFEFF
+}
+
+.even {
+  background-color: #DFFDFF
+}
+
+.record .id {
+  width: 2%;
+}
+
+.record .first_name {
+  width: 8%;
+}
+
+.record .last_name {
+  width: 8%;
+}
+
+.record .company {
+  width: 8%;
+}
+
+.record .email {
+  width: 12%;
+}
+
+.record .address1 {
+  width: 12%;
+}
+
+.record .address2 {
+  width: 6%;
+}
+
+.record .zip {
+  width: 5%;
+}
+
+.record .city {
+  width: 8%;
+}
+
+.record .state_long {
+  width: 8%;
+}
+
+.record .state {
+  width: 2%;
+}
+
+.record .phone {
+  width: 10%;
+}
+
+
