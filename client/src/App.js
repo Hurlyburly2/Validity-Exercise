@@ -8,25 +8,11 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: null
+      duplicates: null,
+      notDuplicates: null,
+      error: null
     };
     this.submitForm = this.submitForm.bind(this)
-  }
-
-  componentDidMount() {
-    this.callBackendAPI()
-      .then(res => this.setState({ data: res.express }))
-      .catch(err => console.log(err))
-  }
-
-  callBackendAPI = async () => {
-    const response = await fetch('/express_backend');
-    const body = await response.json();
-
-    if (response.status !== 200) {
-      throw Error(body.message)
-    }
-    return body;
   }
 
   submitForm(event) {
@@ -35,7 +21,6 @@ class App extends Component {
     const formData = new FormData();
     formData.append("uploadCsv", userFile)
 
-    console.log(userFile);
     fetch('/upload', {
         method: "POST",
         body: formData
@@ -50,9 +35,19 @@ class App extends Component {
       })
       .then(response => response.json())
       .then(response => {
-        this.setState({
-          data: response
-        })
+        if (response.duplicates) {
+          this.setState({
+            duplicates: response.duplicates,
+            notDuplicates: response.notDuplicates,
+            error: null
+          })
+        } else {
+          this.setState({
+            duplicates: null,
+            notDuplicates: null,
+            error: response
+          })
+        }
       })
       .catch(error => {
         console.log(error);
@@ -61,12 +56,20 @@ class App extends Component {
 
   render() {
     return (
-      <div className="Upload">
+      <div className="mainDiv">
         <FormContainer
           formsubmit={this.submitForm}
         />
+        <h2>{this.state.error}</h2>
         <ResultContainer 
-          data={this.state.data}
+          key={1}
+          name="Duplicate Records"
+          data={this.state.duplicates}
+        />
+        <ResultContainer
+          key={2}
+          name="Non-Duplicate Records"
+          data={this.state.notDuplicates}
         />
       </div>
     )
