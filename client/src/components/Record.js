@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Record = (props) => {
-  console.log(props.record)
 
   return (
     <div className={props.oddOrEven}>

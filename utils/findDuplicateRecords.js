@@ -2,10 +2,8 @@ const fs = require('fs')
 const csv = require('fast-csv')
 const levenshtein = require('js-levenshtein');
 
-
+// Create a hash to check for duplicate email addresses without looping through arrays, saving us some searching
 let emailChecker = {};
-let duplicates = [];
-let notDuplicates = [];
 
 // row format by index:
   // 0: id    1: first_name   2: last_name    3: company
@@ -30,6 +28,7 @@ const generateObject = (row) => {
 }
 
 const closeMatch = (object1, object2, property) => {
+  // If the two strings are very similar, we return 1, if they're different, they return zero
   if (levenshtein(object1[property], object2[property]) < 2) {
     return 1
   }
@@ -43,9 +42,10 @@ const checkDuplicates = (currentRow, allRows) => {
     return true;
   } else {
     emailChecker[newObject.email.toLowerCase()] = newObject;
-    // Then we check for similar names
+    let similarityScore = 0;
+    // We create a 'score' for each entry that will help us determine how similar entries are
     allRows.forEach((row) => {
-      similarityScore = 0;
+      // Then we check for similar names
       similarityScore += closeMatch(newObject, row, "first_name") * 3
       similarityScore += closeMatch(newObject, row, "last_name") * 3
       if (similarityScore == 6) {   // if names are similar, check other fields
@@ -61,32 +61,39 @@ const checkDuplicates = (currentRow, allRows) => {
       }
       // Points for close matches are weighted based on my opinion of how important these are to finding duplicate people, these weights are opinion and can be adjusted
       // Total possible score for an exact match would be = 26
-      if (similarityScore > 8) {
-        return true;
-      }
     })
+    if (similarityScore > 8) {
+      // You can only have over an 8 with two name matches plus either:
+        // 1) One important heavily weighted field
+        // 2) A few less important, less weighted fields
+      return true;
+    }
   }
   return false;
 }
 
 const findDuplicateRecords = (filePath) => {
   const allRows = [];
+  let duplicates = [];
+  let notDuplicates = [];
+
   let firstRow = true;
   let validCSV = true;
   emailChecker = {};
-  duplicates = [];
-  notDuplicates = [];
+  
   return new Promise((res, rej) => {
     fs.createReadStream(filePath)
       .pipe(csv.parse({ headers: false }))
       .on('data', row => {
-        if (firstRow) { // Check for bad csv input
+        // First we check to see if the csv we've been sent has headers matching those of Validity's exercise
+        if (firstRow) { 
           if (row.join(',') !== 'id,first_name,last_name,company,email,address1,address2,zip,city,state_long,state,phone') {
             validCSV = false;
             rej('Improper CSV, please upload a Validity Exercise csv file', error => rej(error))
           }
           firstRow = false;
         } else if (validCSV) {
+          // Then we process the rest of the rows, sorting through them as we read the lines one by one
           let isDuplicate = checkDuplicates(row, allRows)
           const currentObject = generateObject(row)
           if (isDuplicate) {
