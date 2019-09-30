@@ -16,6 +16,7 @@ class App extends Component {
   }
 
   submitForm(event) {
+    // Here we get the CSV from the form and post it to the back end
     event.preventDefault()
     const userFile = document.getElementById("csv_upload").files[0]
     const formData = new FormData();
@@ -36,6 +37,7 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if (response.duplicates) {
+          console.log(response)
           this.setState({
             duplicates: response.duplicates,
             notDuplicates: response.notDuplicates,
@@ -51,23 +53,32 @@ class App extends Component {
       })
       .catch(error => {
         console.log(error);
+        this.setState({
+          duplicates: null,
+          notDuplicates: null,
+          error: error
+        })
       })
   }
 
   render() {
+    let error = ""
+    if (this.state.error) { error = this.state.error }
+    // We display an error if something went wrong, or the results in two separate containers if it worked rightgit
+
     return (
       <div className="mainDiv">
         <FormContainer
           formsubmit={this.submitForm}
         />
-        <h2>{this.state.error}</h2>
+        <h2>{error}</h2>
         <ResultContainer 
-          key={1}
+          key="1"
           name="Duplicate Records"
           data={this.state.duplicates}
         />
         <ResultContainer
-          key={2}
+          key="2"
           name="Non-Duplicate Records"
           data={this.state.notDuplicates}
         />
