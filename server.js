@@ -9,10 +9,6 @@ const findDuplicateRecords = require('./utils/findDuplicateRecords')
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
 
-app.get('/', (req, res) => {
-  res.send()
-})
-
 app.post('/upload', upload.single('uploadCsv'), (req, res) => {
   findDuplicateRecords(req.file.path).then((result) => {
     res.json(result)
